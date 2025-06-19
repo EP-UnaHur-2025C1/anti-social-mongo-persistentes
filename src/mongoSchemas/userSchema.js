@@ -1,33 +1,33 @@
-const {mongoose} = require("../db/mongodb")
+const mongoose = require('mongoose');
 const {Schema} = require("mongoose")
-const posteos = require("./postSchema")
-const comentarios = require("./commentSchema")
+
 
 const userSchema = new mongoose.Schema(
     {
       nickName:{
         type: Schema.Types.String,
-        require: true,
+        required: true,
         unique: true
       },
 
       email:{
         type: Schema.Types.String,
-        require: true,
+        required: true,
         unique: true
       },
 
       posteos:{
-          posteos
+           type: Schema.Types.ObjectId, 
+           ref: 'post' 
       },
       
       comentarios:{
-          comentarios
+           type: Schema.Types.ObjectId, 
+           ref: "Comment" 
       }
     }
 )
 
 
-module.exports = {
-         userSchema
-}
+const user = mongoose.model("user", userSchema);
+module.exports = user;

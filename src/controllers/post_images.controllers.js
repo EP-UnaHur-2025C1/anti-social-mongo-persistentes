@@ -1,0 +1,1 @@
+const {mongoose, schema, comment, post_images, post, tag, user} = require("../db/mongoSchemas/index")

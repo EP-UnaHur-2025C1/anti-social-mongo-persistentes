@@ -1,9 +1,7 @@
-const {mongoose} = require("../db/mongodb")
+const mongoose = require('mongoose');
+
 const {Schema} = require("mongoose")
-const {userSchema} = require("./userSchema")
-const comentarios = require("./commentSchema")
-const imagenes = require("./post_imagesSchema")
-const etiquetas = require("./tagSchema")
+
 
 const postSchema = new mongoose.Schema(
     {
@@ -18,24 +16,26 @@ const postSchema = new mongoose.Schema(
         },
 
         user:{
-            userSchema
+            type: Schema.Types.ObjectId, 
+           ref: "user" 
         },
 
         comentarios:{
-            comentarios
+           type: Schema.Types.ObjectId, 
+           ref: "Comment" 
         },
 
         imagenes:{
-            imagenes
+           type: Schema.Types.ObjectId, 
+           ref: "post_Image"
         },
 
         etiquetas:{
-            etiquetas
+            type: Schema.Types.ObjectId, 
+           ref: "tag"
         }
     }
 )
 
-
-module.exports = {
-    postSchema
-}
+const post = mongoose.model("post", postSchema);
+module.exports = post;

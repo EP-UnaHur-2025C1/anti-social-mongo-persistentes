@@ -1,6 +1,6 @@
-const {mongoose} = require("../db/mongodb")
+const mongoose = require('mongoose');
 const {Schema} = require("mongoose")
-const posteos = require("./postSchema")
+
 
 const tagSchema = new mongoose.Schema(
     {
@@ -10,12 +10,12 @@ const tagSchema = new mongoose.Schema(
         },
         
         posteos:{
-            posteos
+           type: Schema.Types.ObjectId, 
+           ref: 'post' 
         }
     }
 )
 
 
-module.exports = {
-    tagSchema
-}
+const tag = mongoose.model("tag", tagSchema);
+module.exports = tag;
