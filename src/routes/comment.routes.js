@@ -10,6 +10,8 @@ router.get("/:id", commentControllers.getComentarioPorId);
 
 router.post("/", commentControllers.crearComentario);
 
+router.put("/:id", commentControllers.modificarComentario)
+
 router.delete("/:id", commentControllers.eliminarComentarioPorId);
 
 module.exports = router;

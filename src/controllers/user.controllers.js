@@ -1,100 +1,97 @@
 const { request } = require("express");
-const {mongoose, schema, user } = require("../db/mongoSchemas/index")
+const { mongoose, schema, user } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
 
-const getUser = async (_, res) => {
-    const redisKey = 'User:todos';
-    try {
-      const cachedUser = await rediscache.get(redisKey);
-      if (cachedUser) {
-        return res.status(200).json(JSON.parse(cachedUser));
-      }
-  
-      const User = await user.find()
+const getUsers = async (_, res) => {
+  const redisKey = 'Users:todos';
+  try {
+    const cachedUser = await rediscache.get(redisKey);
+    if (cachedUser) {
+      return res.status(200).json(JSON.parse(cachedUser));
+    }
+
+    const User = await user.find()
       .select('nickName email')
       .populate('posts.Descripcion posts.FechaDeCreacion')
       .populate('comentarios.mensaje comentarios.FechaDePublicacion');
-      await rediscache.set(redisKey, JSON.stringify(User), { EX: 300 });
-      res.status(200).json(User);
+    await rediscache.set(redisKey, JSON.stringify(User), { EX: 300 });
+    res.status(200).json(User);
 
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-  
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-  const getUserPorId = async (req, res) => {
-    const id = req.params.id;
-    const redisKey = `user:${id}`;
-  
-    try {
-      const cachedUser = await rediscache.get(redisKey);
-      if (cachedUser) {
-        return res.status(200).json(JSON.parse(cachedUser));
-      }
-      const user = await user.findById(id);
-      if (!user) {
-        return res.status(404).json({ message: 'No se encontro el user' });
-      }
-      await rediscache.set(redisKey, JSON.stringify(user), { EX: 300 });
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-  
 
-  const crearUser = async (req, res) => {
-    try {
-      const newUser = new user(req.body);
-      await newUser.save();
-      await rediscache.del('user:todos');
-      res.status(201).json(newUser);
-    } catch (error) {
-      res.status(400).json({error: error.message})
-    }
-  };
-  
+const getUserPorId = async (req, res) => {
+  const id = req.params.id;
+  const redisKey = `User:${id}`;
 
- const eliminarUserPorId = async (req, res) => { 
-    try {
-      const userId = req.params.id;
-  
-      const userEliminado = await user.findByIdAndDelete(userId);
-      if (!userEliminado) {
-        return res.status(404).json({ mensaje: 'User no encontrado' });
-      }
-  
-      await rediscache.del(`user:${tagId}`);
-      await rediscache.del('User:todos');
-  
-      res.status(200).json({ mensaje: 'User eliminado', user: userEliminado });
-    } catch (error) {
-      res.status(500).json({ mensaje: 'Error al eliminar el User', error: error.message });
+  try {
+    const cachedUser = await rediscache.get(redisKey);
+    if (cachedUser) {
+      return res.status(200).json(JSON.parse(cachedUser));
     }
-  };
-  
-  
+    const user = await user.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'No se encontro el user' });
+    }
+    await rediscache.set(redisKey, JSON.stringify(user), { EX: 300 });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-  const modificarUser = async (req, res) => {
-    try {
-      const userActualizado =  await user.findByIdAndUpdate(req.params.id, req.body, {new: true})
-      if (!userActualizado) {
-        return res.status(404).json({ message: 'user no encontrado' });
-      }
-  
-      await rediscache.del(`user:${req.params.id}`);
-      await rediscache.del('User:todos');
-      res.status(200).json({ mensaje: 'user actualizado', user: userActualizado });
-    } catch (error) {
-      res.status(400).json({ mensaje: 'Error al actualizar el user', error: error.message });
+
+const crearUser = async (req, res) => {
+  try {
+    const newUser = new user(req.body);
+    await newUser.save();
+    await rediscache.del('Users:todos');
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+};
+
+const modificarUser = async (req, res) => {
+  try {
+    const userActualizado = await user.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    if (!userActualizado) {
+      return res.status(404).json({ message: 'user no encontrado' });
     }
-  };
-  
+
+    await rediscache.del(`User:${req.params.id}`);
+    await rediscache.del('Users:todos');
+    res.status(200).json({ mensaje: 'user actualizado', user: userActualizado });
+  } catch (error) {
+    res.status(400).json({ mensaje: 'Error al actualizar el user', error: error.message });
+  }
+};
+
+const eliminarUserPorId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const userEliminado = await user.findByIdAndDelete(userId);
+    if (!userEliminado) {
+      return res.status(404).json({ mensaje: 'User no encontrado' });
+    }
+
+    await rediscache.del(`User:${tagId}`);
+    await rediscache.del('Users:todos');
+
+    res.status(200).json({ mensaje: 'User eliminado', user: userEliminado });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar el User', error: error.message });
+  }
+};
+
 module.exports = {
-  getUser,
+  getUsers,
   getUserPorId,
   crearUser,
-  eliminarUserPorId,
-  modificarUser
+  modificarUser,
+  eliminarUserPorId
 };
