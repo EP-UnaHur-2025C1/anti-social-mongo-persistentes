@@ -17,4 +17,4 @@ const post_ImageSchema = new mongoose.Schema(
 )
 
 const post_Image = mongoose.model("post_Image", post_ImageSchema);
-module.exports = post_Image;
+module.exports = {post_Image};

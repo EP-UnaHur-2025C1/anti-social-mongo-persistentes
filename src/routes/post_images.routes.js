@@ -8,7 +8,7 @@ router.get("/", postImageControllers.getPostImages);
 
 router.get("/:id", postImageControllers.getPostImagePorId);
 
-router.postImage("/", postImageControllers.crearPostImage);
+router.post("/", postImageControllers.crearPostImage);
 
 router.put("/:id", postImageControllers.modificarPostImage)
 

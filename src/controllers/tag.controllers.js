@@ -31,12 +31,12 @@ const getTagPorId = async (req, res) => {
     if (cachedTag) {
       return res.status(200).json(JSON.parse(cachedTag));
     }
-    const tag = await tag.findById(id);
+    const etiqueta = await tag.findById(id);
     if (!post) {
       return res.status(404).json({ message: 'No se encontro el tag' });
     }
-    await rediscache.set(redisKey, JSON.stringify(tag), { EX: 300 });
-    res.status(200).json(tag);
+    await rediscache.set(redisKey, JSON.stringify(etiqueta), { EX: 300 });
+    res.status(200).json(etiqueta);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

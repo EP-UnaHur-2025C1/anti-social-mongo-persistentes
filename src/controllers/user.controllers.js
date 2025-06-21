@@ -12,7 +12,7 @@ const getUsers = async (_, res) => {
 
     const User = await user.find()
       .select('nickName email')
-      .populate('posts.Descripcion posts.FechaDeCreacion')
+      .populate('posteos.Descripcion posteos.FechaDeCreacion')
       .populate('comentarios.mensaje comentarios.FechaDePublicacion');
     await rediscache.set(redisKey, JSON.stringify(User), { EX: 300 });
     res.status(200).json(User);
@@ -32,12 +32,12 @@ const getUserPorId = async (req, res) => {
     if (cachedUser) {
       return res.status(200).json(JSON.parse(cachedUser));
     }
-    const user = await user.findById(id);
-    if (!user) {
+    const usuario = await user.findById(id);
+    if (!usuario) {
       return res.status(404).json({ message: 'No se encontro el user' });
     }
-    await rediscache.set(redisKey, JSON.stringify(user), { EX: 300 });
-    res.status(200).json(user);
+    await rediscache.set(redisKey, JSON.stringify(usuario), { EX: 300 });
+    res.status(200).json(usuario);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

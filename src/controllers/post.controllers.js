@@ -35,12 +35,12 @@ const getPostPorId = async (req, res) => {
     if (cachedPost) {
       return res.status(200).json(JSON.parse(cachedPost));
     }
-    const post = await post.findById(id);
-    if (!post) {
+    const posteo = await post.findById(id);
+    if (!posteo) {
       return res.status(404).json({ message: 'No se encontro el post' });
     }
-    await rediscache.set(redisKey, JSON.stringify(post), { EX: 300 });
-    res.status(200).json(post);
+    await rediscache.set(redisKey, JSON.stringify(posteo), { EX: 300 });
+    res.status(200).json(posteo);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

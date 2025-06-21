@@ -27,7 +27,7 @@ const postSchema = new mongoose.Schema(
 
         imagenes:{
            type: Schema.Types.ObjectId, 
-           ref: "post_Image"
+           ref: "post_Image",
         },
 
         etiquetas:{
@@ -38,4 +38,4 @@ const postSchema = new mongoose.Schema(
 )
 
 const post = mongoose.model("post", postSchema);
-module.exports = post;
+module.exports = {post};

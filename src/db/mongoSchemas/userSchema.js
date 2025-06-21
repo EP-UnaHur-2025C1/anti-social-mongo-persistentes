@@ -18,16 +18,18 @@ const userSchema = new mongoose.Schema(
 
       posteos:{
            type: Schema.Types.ObjectId, 
-           ref: 'post' 
+           ref: 'post',
+           options: {strictPopulate: false}
       },
       
       comentarios:{
            type: Schema.Types.ObjectId, 
-           ref: "Comment" 
+           ref: "Comment" ,
+           options: {strictPopulate: false}
       }
     }
 )
 
 
 const user = mongoose.model("user", userSchema);
-module.exports = user;
+module.exports = {user};
