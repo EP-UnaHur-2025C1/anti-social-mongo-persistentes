@@ -7,12 +7,12 @@ const postSchema = new mongoose.Schema(
     {
         Descripcion:{ 
             type: Schema.Types.String,
-            require: true
+            required: true
         },
 
         FechaDeCreacion:{
             type: Schema.Types.Date,
-            require: true
+            required: true
         },
 
         user:{
@@ -20,22 +20,26 @@ const postSchema = new mongoose.Schema(
            ref: "user" 
         },
 
-        comentarios:{
+        comentarios:[{
            type: Schema.Types.ObjectId, 
-           ref: "Comment" 
-        },
+           ref: "comment" ,
+           options: {strictPopulate: false}
+        }],
 
-        imagenes:{
+        imagenes:[{
            type: Schema.Types.ObjectId, 
            ref: "post_Image",
-        },
+           options: {strictPopulate: false}
+        }],
 
-        etiquetas:{
+        etiquetas:[{
             type: Schema.Types.ObjectId, 
-           ref: "tag"
-        }
+           ref: "tag",
+           options: {strictPopulate: false}
+        }]
     }
 )
+
 
 const post = mongoose.model("post", postSchema);
 module.exports = {post};

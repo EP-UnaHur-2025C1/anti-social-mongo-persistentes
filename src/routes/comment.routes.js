@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const router = Router();
-const commentControllers = require("../controllers/comment.controllers");
+const {commentControllers} = require("../controllers");
 
 
 

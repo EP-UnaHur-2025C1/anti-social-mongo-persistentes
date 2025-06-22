@@ -1,17 +1,17 @@
 const { Router } = require("express");
 const router = Router();
-const postImageControllers = require("../controllers/post_images.controllers");
+const {post_imagesControllers} = require("../controllers");
 
 
 
-router.get("/", postImageControllers.getPostImages);
+router.get("/", post_imagesControllers.getPostImages);
 
-router.get("/:id", postImageControllers.getPostImagePorId);
+router.get("/:id", post_imagesControllers.getPostImagePorId);
 
-router.post("/", postImageControllers.crearPostImage);
+router.post("/", post_imagesControllers.crearPostImage);
 
-router.put("/:id", postImageControllers.modificarPostImage)
+router.put("/:id", post_imagesControllers.modificarPostImage)
 
-router.delete("/:id", postImageControllers.eliminarPostImagePorId);
+router.delete("/:id", post_imagesControllers.eliminarPostImagePorId);
 
 module.exports = router;

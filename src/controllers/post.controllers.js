@@ -1,5 +1,5 @@
 const { request } = require("express");
-const { mongoose, schema, post } = require("../db/mongoSchemas/index")
+const { mongoose, schema, post, user } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
 
 const getPosts = async (_, res) => {
@@ -12,10 +12,10 @@ const getPosts = async (_, res) => {
 
     const Post = await post.find()
       .select('Descripcion FechaDeCreacion')
-      .populate('user.nickName user.email')
-      .populate('comentarios.mensaje comentarios.FechaDePublicacion')
-      .populate('imagenes.url')
-      .populate('etiquetas.name');
+      .populate('user', 'nickName email')
+      .populate('comentarios')
+      .populate('imagenes')
+      .populate('etiquetas');
     await rediscache.set(redisKey, JSON.stringify(Post), { EX: 300 });
     res.status(200).json(Post);
 
@@ -35,24 +35,45 @@ const getPostPorId = async (req, res) => {
     if (cachedPost) {
       return res.status(200).json(JSON.parse(cachedPost));
     }
-    const posteo = await post.findById(id);
+    const posteo = await post.findById(id)
+      .populate('user')
+      .populate('comentarios')
+      .populate('imagenes')
+      .populate('etiquetas');
     if (!posteo) {
       return res.status(404).json({ message: 'No se encontro el post' });
     }
     await rediscache.set(redisKey, JSON.stringify(posteo), { EX: 300 });
-    res.status(200).json(posteo);
+    res.status(200).json(JSON.parse(JSON.stringify(posteo)));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 
+
+
 const crearPost = async (req, res) => {
   try {
-    const newPost = new post(req.body);
+    const { Descripcion, FechaDeCreacion, userId } = req.body
+    const usuarioCreador = await user.findById(userId)
+
+    if (!usuarioCreador) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    const newPost = new post({
+      Descripcion,
+      FechaDeCreacion,
+      user: usuarioCreador
+    });
+
     await newPost.save();
+    const posteos = usuarioCreador.posteos
+    const últimoLugar = posteos.length
+    posteos[últimoLugar] = newPost
+    await usuarioCreador.save()
     await rediscache.del('Posteos:todos');
-    res.status(201).json(newPost);
+    res.status(201).json(JSON.parse(JSON.stringify(newPost)));
   } catch (error) {
     res.status(400).json({ error: error.message })
   }
@@ -76,7 +97,7 @@ const modificarPost = async (req, res) => {
 const eliminarPostPorId = async (req, res) => {
   try {
     const postId = req.params.id;
-
+    
     const postEliminado = await post.findByIdAndDelete(postId);
     if (!postEliminado) {
       return res.status(404).json({ mensaje: 'Post no encontrado' });

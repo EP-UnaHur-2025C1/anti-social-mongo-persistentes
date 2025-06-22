@@ -6,12 +6,12 @@ const commentSchema = new mongoose.Schema(
     {
         mensaje:{
             type: Schema.Types.String,
-            require: true
+            required: true
         },
 
         FechaDePublicación:{
             type: Schema.Types.Date,
-            require: true
+            required: true
         },
 
         user:{
@@ -26,5 +26,5 @@ const commentSchema = new mongoose.Schema(
     }
 )
 
-const comment = mongoose.model("Comment", commentSchema);
+const comment = mongoose.model("comment", commentSchema);
 module.exports = {comment};

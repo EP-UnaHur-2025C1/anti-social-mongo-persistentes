@@ -6,16 +6,16 @@ const tagSchema = new mongoose.Schema(
     {
         name:{
             type: Schema.Types.String,
-            require: true
+            required: true
         },
         
-        posteos:{
+        posteos:[{
            type: Schema.Types.ObjectId, 
            ref: 'post' 
-        }
+        }]
     }
 )
 
 
-const tag = mongoose.model("tag", tagSchema);
-module.exports = {tag};
+const tag = mongoose.model("tag", tagSchema)
+module.exports = {tag}

@@ -9,11 +9,11 @@ const getUsers = async (_, res) => {
     if (cachedUser) {
       return res.status(200).json(JSON.parse(cachedUser));
     }
-
+    
     const User = await user.find()
       .select('nickName email')
-      .populate('posteos.Descripcion posteos.FechaDeCreacion')
-      .populate('comentarios.mensaje comentarios.FechaDePublicacion');
+      .populate('posteos')
+      .populate('comentarios');
     await rediscache.set(redisKey, JSON.stringify(User), { EX: 300 });
     res.status(200).json(User);
 
@@ -73,13 +73,13 @@ const modificarUser = async (req, res) => {
 const eliminarUserPorId = async (req, res) => {
   try {
     const userId = req.params.id;
-
-    const userEliminado = await user.findByIdAndDelete(userId);
-    if (!userEliminado) {
+    if (!user.findById(userId)) {
       return res.status(404).json({ mensaje: 'User no encontrado' });
     }
+    const userEliminado = await user.findByIdAndDelete(userId);
+    
 
-    await rediscache.del(`User:${tagId}`);
+    await rediscache.del(`User:${userId}`);
     await rediscache.del('Users:todos');
 
     res.status(200).json({ mensaje: 'User eliminado', user: userEliminado });

@@ -16,17 +16,17 @@ const userSchema = new mongoose.Schema(
         unique: true
       },
 
-      posteos:{
+      posteos:[{
            type: Schema.Types.ObjectId, 
            ref: 'post',
            options: {strictPopulate: false}
-      },
+      }],
       
-      comentarios:{
+      comentarios:[{
            type: Schema.Types.ObjectId, 
-           ref: "Comment" ,
+           ref: "comment" ,
            options: {strictPopulate: false}
-      }
+      }]
     }
 )
 
