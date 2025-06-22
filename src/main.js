@@ -2,7 +2,7 @@ const { userRoute, postRoute, commentRoute, tagRoute, post_imageRoute} = require
 const express = require("express");
 const conectarDB = require("../src/db/mongodb")
 const app = express()
-const PORT = process.env.PORT ?? 3001
+const PORT = process.env.PORT ?? 3000
 const rediscache = require("../src/db/rediscache")
 const dotenv = require('dotenv')
 

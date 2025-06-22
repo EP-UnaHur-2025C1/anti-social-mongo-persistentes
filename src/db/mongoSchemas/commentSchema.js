@@ -9,19 +9,23 @@ const commentSchema = new mongoose.Schema(
             required: true
         },
 
-        FechaDePublicación:{
+        FechaDePublicacion:{
             type: Schema.Types.Date,
             required: true
         },
 
-        user:{
+        usuario:{
            type: Schema.Types.ObjectId, 
-           ref: "user" 
+           required: true,
+           ref: "user" ,
+           options: {strictPopulate: false}
         },
         
         posteo:{
-           type: Schema.Types.ObjectId, 
-           ref: 'post'
+           type: Schema.Types.ObjectId,
+           required: true, 
+           ref: 'post',
+           options: {strictPopulate: false}
         }
     }
 )

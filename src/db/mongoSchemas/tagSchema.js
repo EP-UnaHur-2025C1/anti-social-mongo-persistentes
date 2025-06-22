@@ -11,7 +11,8 @@ const tagSchema = new mongoose.Schema(
         
         posteos:[{
            type: Schema.Types.ObjectId, 
-           ref: 'post' 
+           ref: 'post',
+           options: {strictPopulate: false}
         }]
     }
 )

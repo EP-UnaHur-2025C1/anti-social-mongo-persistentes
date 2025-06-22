@@ -12,6 +12,8 @@ router.post("/", postControllers.crearPost);
 
 router.put("/:id", postControllers.modificarPost)
 
+router.put("/addTag/:id", postControllers.agregarTagAlPost)
+
 router.delete("/:id", postControllers.eliminarPostPorId);
 
 module.exports = router;
