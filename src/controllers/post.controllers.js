@@ -1,5 +1,5 @@
 const { request } = require("express");
-const { mongoose, schema, post, user, tag ,comment} = require("../db/mongoSchemas/index")
+const { mongoose, schema, post, user, tag ,comment, post_Image} = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
 
 const getPosts = async (_, res) => {
@@ -14,7 +14,7 @@ const getPosts = async (_, res) => {
       .select('Descripcion FechaDeCreacion')
       .populate({path: 'usuario',select: 'nickName email -_id'})
       .populate({path:'comentarios',select:'mensaje FechaDePublicacion -_id'})
-      .populate('imagenes')
+      .populate({path: 'imagenes',select: 'url -_id'})
       .populate({path:'etiquetas' ,select:'name -_id'} );
     //await rediscache.set(redisKey, JSON.stringify(Post), { EX: 300 });
     res.status(200).json(Post);
@@ -123,6 +123,7 @@ const eliminarPostPorId = async (req, res) => {
     const postId = req.params.id;
 
     await comment.deleteMany({posteo: postId})
+    await post_Image.deleteMany({posteo: postId})
     const postEliminado = await post.findByIdAndDelete(postId);
     if (!postEliminado) {
       return res.status(404).json({ mensaje: 'Post no encontrado' });

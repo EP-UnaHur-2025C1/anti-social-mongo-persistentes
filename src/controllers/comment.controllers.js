@@ -35,9 +35,6 @@ const getComentarioPorId = async (req, res) => {
       .select('mensaje FechaDePublicacion')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    if (!comentario) {
-      return res.status(404).json({ message: 'No se encontro el comentario' });
-    }
     //await rediscache.set(redisKey, JSON.stringify(comentario), { EX: 300 });
     res.status(200).json(comentario);
   } catch (error) {

@@ -11,7 +11,9 @@ const post_ImageSchema = new mongoose.Schema(
         
         posteo:{
            type: Schema.Types.ObjectId, 
-           ref: 'post' 
+           ref: 'post' ,
+           required: true,
+           
         }
     }
 )
