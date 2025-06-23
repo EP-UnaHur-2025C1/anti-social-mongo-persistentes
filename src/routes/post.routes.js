@@ -1,19 +1,22 @@
 const { Router } = require("express");
 const router = Router();
 const {postControllers} = require("../controllers");
+const { postSchema } = require("../joiSchemas/index.schema");
+const { schemaValidator, existsSchemaById } = require("../middlewares");
+const { post } = require("../db/mongoSchemas");
 
 
 
 router.get("/", postControllers.getPosts);
 
-router.get("/:id", postControllers.getPostPorId);
+router.get("/:id", existsSchemaById(post), postControllers.getPostPorId);
 
-router.post("/", postControllers.crearPost);
+router.post("/", schemaValidator(postSchema), postControllers.crearPost);
 
-router.put("/:id", postControllers.modificarPost)
+router.put("/:id", existsSchemaById(post), postControllers.modificarPost)
 
-router.put("/addTag/:id", postControllers.agregarTagAlPost)
+router.put("/addTag/:id", existsSchemaById(post), postControllers.agregarTagAlPost)
 
-router.delete("/:id", postControllers.eliminarPostPorId);
+router.delete("/:id", existsSchemaById(post), postControllers.eliminarPostPorId);
 
 module.exports = router;

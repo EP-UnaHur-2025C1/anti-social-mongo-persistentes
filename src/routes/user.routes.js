@@ -1,19 +1,20 @@
 const { Router } = require("express");
 const router = Router();
 const {userControllers} = require("../controllers");
-const { existsModelById } = require("../middlewares");
+const { existsSchemaById, schemaValidator } = require("../middlewares");
 const { user } = require("../db/mongoSchemas");
+const { userSchema } = require("../joiSchemas/index.schema");
 
 
 
 router.get("/", userControllers.getUsers);
 
-router.get("/:id", existsModelById(user),  userControllers.getUserPorId);
+router.get("/:id", existsSchemaById(user),  userControllers.getUserPorId);
 
-router.post("/", userControllers.crearUser);
+router.post("/", schemaValidator(userSchema), userControllers.crearUser);
 
-router.put("/:id", userControllers.modificarUser)
+router.put("/:id", existsSchemaById(user), userControllers.modificarUser)
 
-router.delete("/:id",existsModelById(user),userControllers.eliminarUserPorId);
+router.delete("/:id", existsSchemaById(user),userControllers.eliminarUserPorId);
 
 module.exports = router;

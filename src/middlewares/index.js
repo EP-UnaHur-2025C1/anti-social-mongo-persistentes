@@ -1,3 +1,3 @@
-const {existsModelById, schemaValidator} = require("./generic.middleware")
+const {existsSchemaById, schemaValidator} = require("./generic.middleware")
 
-module.exports = {existsModelById, schemaValidator}
+module.exports = {existsSchemaById, schemaValidator}
