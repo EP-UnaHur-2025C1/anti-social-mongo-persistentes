@@ -10,7 +10,7 @@ const getComentarios = async (_, res) => {
     //}
 
     const comentarios = await comment.find()
-      .select('mensaje FechaDePublicacion')
+      .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
     //await rediscache.set(redisKey, JSON.stringify(comentarios), { EX: 300 });
@@ -32,7 +32,7 @@ const getComentarioPorId = async (req, res) => {
     //  return res.status(200).json(JSON.parse(cachedComments));
     //}
     const comentario = await comment.findById(id)
-      .select('mensaje FechaDePublicacion')
+      .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
     //await rediscache.set(redisKey, JSON.stringify(comentario), { EX: 300 });
@@ -48,6 +48,16 @@ const crearComentario = async (req, res) => {
     const { mensaje, FechaDePublicacion, usuario, posteo } = req.body;
     const usuarioCreador = await user.findById(usuario)
     const posteoDelComentario = await post.findById(posteo)
+    const meses = parseInt(process.env.MESES_VISIBLES) || 6;
+    const fechaLimite = new Date()
+    
+    
+
+    fechaLimite.setMonth(fechaLimite.getMonth() - meses)
+    
+    const visibilidad =   fechaLimite < new Date(FechaDePublicacion)  ;
+
+
 
     if (!usuarioCreador) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -55,6 +65,7 @@ const crearComentario = async (req, res) => {
     const newComment = new comment({
       mensaje,
       FechaDePublicacion,
+      visibilidad,
       usuario,
       posteo
 

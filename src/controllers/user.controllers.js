@@ -15,6 +15,7 @@ const getUsers = async (_, res) => {
       .populate({path:'posteos', select: 'Descripcion FechaDeCreacion -_id'})
       .populate({
         path:'comentarios',
+        match:{visibilidad:true},
         select: 'mensaje FechaDePublicacion -_id',
         populate:{path:'posteo',select:'Descripcion -_id'}
       });
@@ -40,6 +41,7 @@ const getUserPorId = async (req, res) => {
     .populate({path:'posteos', select: 'Descripcion FechaDeCreacion -_id'})
     .populate({
         path:'comentarios',
+        match:{visibilidad:true},
         select: 'mensaje FechaDePublicacion -_id',
         populate:{path:'posteo',select:'Descripcion -_id'}
       });

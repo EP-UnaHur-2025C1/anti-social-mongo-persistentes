@@ -13,7 +13,7 @@ const getPosts = async (_, res) => {
     const Post = await post.find()
       .select('Descripcion FechaDeCreacion')
       .populate({path: 'usuario',select: 'nickName email -_id'})
-      .populate({path:'comentarios',select:'mensaje FechaDePublicacion -_id'})
+      .populate({path:'comentarios',match:{visibilidad:true},select:'mensaje FechaDePublicacion -_id'})
       .populate({path: 'imagenes',select: 'url -_id'})
       .populate({path:'etiquetas' ,select:'name -_id'} );
     //await rediscache.set(redisKey, JSON.stringify(Post), { EX: 300 });
@@ -37,8 +37,8 @@ const getPostPorId = async (req, res) => {
     //}
     const posteo = await post.findById(id)
       .populate({path: 'usuario',select: 'nickName email -_id'})
-      .populate({path:'comentarios',select:'mensaje FechaDePublicacion -_id'})
-      .populate('imagenes')
+      .populate({path:'comentarios' ,match:{visibilidad:true},select:'mensaje FechaDePublicacion -_id'})
+      .populate({path: 'imagenes',select: 'url -_id'})
       .populate({path:'etiquetas' ,select:'name -_id'});
     if (!posteo) {
       return res.status(404).json({ message: 'No se encontro el post' });

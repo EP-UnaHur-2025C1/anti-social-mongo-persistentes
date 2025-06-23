@@ -13,6 +13,10 @@ const commentSchema = new mongoose.Schema(
             type: Schema.Types.Date,
             required: true
         },
+        visibilidad:{
+            type: Schema.Types.Boolean
+        }
+        ,
 
         usuario:{
            type: Schema.Types.ObjectId, 
