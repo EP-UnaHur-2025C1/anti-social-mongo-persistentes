@@ -4,12 +4,13 @@ const {commentControllers} = require("../controllers");
 const { commentSchema } = require("../joiSchemas/index.schema");
 const { schemaValidator, existsSchemaById } = require("../middlewares");
 const { comment } = require("../db/mongoSchemas");
+const {checkCacheCommentById,checkCacheAllComments} = require("../middlewares/redis.middleware")
 
 
 
-router.get("/", commentControllers.getComentarios);
+router.get("/",checkCacheAllComments, commentControllers.getComentarios);
 
-router.get("/:id", existsSchemaById(comment), commentControllers.getComentarioPorId);
+router.get("/:id", existsSchemaById(comment), checkCacheCommentById,commentControllers.getComentarioPorId);
 
 router.post("/", schemaValidator(commentSchema), commentControllers.crearComentario);
 

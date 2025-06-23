@@ -4,12 +4,13 @@ const {postControllers} = require("../controllers");
 const { postSchema } = require("../joiSchemas/index.schema");
 const { schemaValidator, existsSchemaById } = require("../middlewares");
 const { post } = require("../db/mongoSchemas");
+const {checkCachePostById,checkCacheAllPosts} = require("../middlewares/redis.middleware")
 
 
 
-router.get("/", postControllers.getPosts);
+router.get("/", checkCacheAllPosts,postControllers.getPosts);
 
-router.get("/:id", existsSchemaById(post), postControllers.getPostPorId);
+router.get("/:id", existsSchemaById(post),checkCachePostById, postControllers.getPostPorId);
 
 router.post("/", schemaValidator(postSchema), postControllers.crearPost);
 

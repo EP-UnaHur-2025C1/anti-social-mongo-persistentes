@@ -2,18 +2,14 @@ const { mongoose, schema, comment, user, post } = require("../db/mongoSchemas/in
 const rediscache = require("../db/rediscache")
 
 const getComentarios = async (_, res) => {
-  //const redisKey = 'Comentarios:todos';
+  const redisKey = 'Comentarios:todos';
   try {
-    //const cachedComments = await rediscache.get(redisKey);
-    //if (cachedComments) {
-    // return res.status(200).json(JSON.parse(cachedComments));
-    //}
-
+    
     const comentarios = await comment.find()
       .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    //await rediscache.set(redisKey, JSON.stringify(comentarios), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(comentarios), { EX: 300 });
     res.status(200).json(comentarios);
 
   } catch (error) {
@@ -24,18 +20,15 @@ const getComentarios = async (_, res) => {
 
 const getComentarioPorId = async (req, res) => {
   const id = req.params.id;
-  // const redisKey = `Comentario:${id};`
+   const redisKey = `Comentarios:${id};`
 
   try {
-    // const cachedComments = await rediscache.get(redisKey);
-    //if (cachedComments) {
-    //  return res.status(200).json(JSON.parse(cachedComments));
-    //}
+  
     const comentario = await comment.findById(id)
       .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    //await rediscache.set(redisKey, JSON.stringify(comentario), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(comentario), { EX: 300 });
     res.status(200).json(comentario);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -77,7 +70,11 @@ const crearComentario = async (req, res) => {
     await newComment.save();
 
 
-    //await rediscache.del('Comentarios:todos');
+    await rediscache.del('Comentarios:todos');
+    await rediscache.del('Posteos:todos');
+    await rediscache.del(`posteos:${posteoDelComentario}`);
+    await rediscache.del('Users:todos');
+    await rediscache.del(`Users:${usuarioCreador}`);
     res.status(201).json(newComment);
   } catch (error) {
     res.status(400).json({ error: error.message })
@@ -85,14 +82,20 @@ const crearComentario = async (req, res) => {
 };
 
 const modificarComentario = async (req, res) => {
+  const usuarioCreador = await user.findByOne({comentarios:req.params.id})
+  const posteoDelComentario = await post.findByOne({comentarios:req.params.id})
   try {
     const comentarioActualizado = await comment.findByIdAndUpdate(req.params.id, req.body, { new: true })
     if (!comentarioActualizado) {
       return res.status(404).json({ message: 'Comentario no encontrado' });
     }
 
-    //await rediscache.del(`Comentario:${req.params.id}`);
-    //await rediscache.del('Comentarios:todos');
+    await rediscache.del(`Comentarios:${req.params.id}`);
+    await rediscache.del('Comentarios:todos');
+    await rediscache.del('Posteos:todos');
+    await rediscache.del(`posteos:${posteoDelComentario}`);
+    await rediscache.del('Users:todos');
+    await rediscache.del(`Users:${usuarioCreador}`);
     res.status(200).json({ mensaje: 'Comentario actualizado', comentario: comentarioActualizado });
   } catch (error) {
     res.status(400).json({ mensaje: 'Error al actualizar el comentario', error: error.message });
@@ -100,6 +103,8 @@ const modificarComentario = async (req, res) => {
 };
 
 const eliminarComentarioPorId = async (req, res) => {
+  const usuarioCreador = await user.findByOne({comentarios:req.params.id})
+  const posteoDelComentario = await post.findByOne({comentarios:req.params.id})
   try {
     const commentId = req.params.id;
 
@@ -108,8 +113,12 @@ const eliminarComentarioPorId = async (req, res) => {
       return res.status(404).json({ mensaje: 'Comentario no encontrado' });
     }
 
-    // await rediscache.del(`Comentario:${commentId}`);
-    //await rediscache.del('Comentarios:todos');
+    await rediscache.del(`Comentarios:${req.params.id}`);
+    await rediscache.del('Comentarios:todos');
+    await rediscache.del('Posteos:todos');
+    await rediscache.del(`posteos:${posteoDelComentario}`);
+    await rediscache.del('Users:todos');
+    await rediscache.del(`Users:${usuarioCreador}`);
 
     res.status(200).json({ mensaje: 'Comentario eliminado', comentario: comentarioEliminado });
   } catch (error) {

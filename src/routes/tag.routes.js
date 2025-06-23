@@ -4,12 +4,13 @@ const {tagControllers} = require("../controllers");
 const { tagSchema } = require("../joiSchemas/index.schema");
 const { schemaValidator, existsSchemaById } = require("../middlewares");
 const { tag } = require("../db/mongoSchemas");
+const {checkCacheTagById,checkCacheAllTags} = require("../middlewares/redis.middleware")
 
 
 
-router.get("/", tagControllers.getTags);
+router.get("/",checkCacheAllTags, tagControllers.getTags);
 
-router.get("/:id", existsSchemaById(tag), tagControllers.getTagPorId);
+router.get("/:id", existsSchemaById(tag),checkCacheTagById, tagControllers.getTagPorId);
 
 router.post("/", schemaValidator(tagSchema), tagControllers.crearTag);
 
