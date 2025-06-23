@@ -1,86 +1,171 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/NImNxoFn)
-# UnaHur - Red Anti-Social
+# 🕸️ UnaHur Anti-Social Net - Backend
 
-Se solicita el modelado y desarrollo de un sistema backend para una red social llamada **“UnaHur Anti-Social Net”**, inspirada en plataformas populares que permiten a los usuarios realizar publicaciones y recibir comentarios sobre las mismas.
+Este proyecto implementa el backend para **UnaHur Anti-Social Net**, una red anti-social donde los usuarios pueden realizar publicaciones, agregar imágenes mediante URLs, etiquetarlas, y recibir comentarios. También se incluye cache con Redis para mejorar el rendimiento.
 
-![Imagen](./assets/ANTI-SOCIALNET.jpeg)
+---
 
-# Contexto del Proyecto
+## 📦 Tecnologías utilizadas
 
-En una primera reunión con los sponsors del proyecto, se definieron los siguientes requerimientos para el desarrollo de un **MVP (Producto Mínimo Viable)**:
+- Node.js + Express
+- MongoDB + Mongoose
+- Redis (caché)
+- .env (configuración)
+- Docker y docker-compose
+- Swagger (documentación de API)
 
-- El sistema debe permitir que un usuario registrado realice una publicación (post), incluyendo **obligatoriamente una descripción**. De forma opcional, se podrán asociar **una o más imágenes** a dicha publicación.
+---
 
-- Las publicaciones pueden recibir **comentarios** por parte de otros usuarios.
+## 🧩 Diagrama UML
 
-- Las publicaciones pueden estar asociadas a **etiquetas (tags)**. Una misma etiqueta puede estar vinculada a múltiples publicaciones.
+El siguiente diagrama muestra la relación entre las entidades principales del sistema:
 
-- Es importante que los **comentarios más antiguos que X meses** (valor configurable mediante variables de entorno, por ejemplo, 6 meses) **no se muestren** en la visualización de los posteos.
+![Diagrama UML](./assets/uml-diagrama.png)
 
-####
+---
 
-# Entidades y Reglas de Negocio
+## 📁 Estructura del Proyecto
 
-Los sponsors definieron los siguientes nombres y descripciones para las entidades:
+```
+/mi-proyecto
+├── assets
+├── node_modules
+├── src
+│   ├── db
+│   ├── mongoSchemas
+│   │   ├── commentschemas.js
+│   │   ├── postschemas.js
+│   │   ├── userschemas.js
+│   │   ├── tagschemas.js
+│   │   ├── post_imageschemas.js
+│   │   └── index.js        
+│   ├── mongodb.js            
+│   ├── rediscache.js       
+│
+├── controllers
+│   ├── comment.controller.js
+│   ├── post.controller.js
+│   ├── user.controller.js
+│   ├── tag.controller.js
+│   ├── post_image.controller.js
+│   └── index.js             
+│
+├── router
+│   ├── comment.routes.js
+│   ├── post.routes.js
+│   ├── user.routes.js
+│   ├── tag.routes.js
+│   ├── post_image.routes.js
+│   └── index.js          
+│
+├── main.js                  
+├── .env
+├── .gitignore
+├── docker-compose.yml
+├── package-lock.json
+└── package.json
+└── readme.md
+```
 
-- **User**: Representa a los usuarios registrados en el sistema. El campo `nickName` debe ser **único** y funcionará como identificador principal del usuario.
+---
 
-- **Post**: Publicación realizada por un usuario en una fecha determinada que contiene el texto que desea publicar. Puede tener **cero o más imágenes** asociadas. Debe contemplarse la posibilidad de **agregar o eliminar imágenes** posteriormente.
+## ⚙️ Configuración de entorno
 
-- **Post_Images**: Entidad que registra las imágenes asociadas a los posts. Para el MVP, solo se requiere almacenar la **URL de la imagen alojada**.
+Crear un archivo `.env` con las siguientes variables:
 
-- **Comment**: Comentario que un usuario puede realizar sobre una publicación. Incluye la fecha en la que fue realizado y una indicación de si está **visible o no**, dependiendo de la configuración (X meses).
+```
+PORT=3000
+DB_URI=mongodb://mongo:27017/antisocial
+REDIS_HOST=redis
+REDIS_PORT=6379
+COMMENTS_MAX_AGE_MONTHS=6
+```
 
-- **Tag**: Etiqueta que puede ser asignada a un post. Una etiqueta puede estar asociada a **muchos posts**, y un post puede tener **múltiples etiquetas**.
+---
 
-# Requerimientos Técnicos
+## 🚀 Uso
 
-1. **Modelado de Datos**
+### Instalación
 
-   - Diseñar el modelo documental que represtente todas las entidades definidas por los sponsor del proyecto. Queda a su criterio si usan relaciones embebidas o relaciones referenciadas a otros documentos.
+```
+npm install
+```
 
-### Ejemplo referenciadas
+### Ejecución en desarrollo
 
-![referenciadas](./assets/Referenciada.png)
+```
+npm run dev
+```
 
-2. **Desarrollo del Backend**
+### Producción
 
-   - Crear los **endpoints CRUD** necesarios para cada entidad.
+```
+npm start
+```
 
-   - Implementar las rutas necesarias para gestionar las relaciones entre entidades (por ejemplo: asociar imágenes a un post, etiquetas a una publicación, etc.).
+### Con Docker
 
-   - Desarrollar las validaciones necesarias para asegurar la integridad de los datos (schemas, validaciones de integridad referencial).
+```
+docker-compose up
+```
 
-   - Desarrollar las funciones controladoras con una única responsabiliad evitando realizar comprobaciones innecesarias en esta parte del código.
+---
 
-3. **Configuración y Portabilidad**
+## 🔧 Funcionalidades
 
-   - El sistema debe poder cambiar de **base de datos** de forma transparente, utilizando configuración e instalación de dependencias adecuadas.
+- Registro de usuarios únicos mediante `userId`
+- CRUD de publicaciones con descripción obligatoria
+- Imágenes asociadas a publicaciones por URL
+- Etiquetas reutilizables entre publicaciones
+- Comentarios asociados a publicaciones
+- Ocultamiento de comentarios según antigüedad (configurable)
+- Caché en Redis para endpoints de lectura
+- Validaciones y estructura de datos con Mongoose
 
-   - El sistema debe permitir configurar el **puerto de ejecución y variables de entorno** fácilmente.
+---
 
-4. **Documentación**
+## 📚 Documentación de la API
 
-   - Generar la documentación de la API utilizando **Swagger (formato YAML)**, incluyendo todos los endpoints definidos.
+Disponible vía Swagger en:
 
-5. **Colecciones de Prueba**
+```
+http://localhost:3000/api-docs
+```
 
-   - Entregar las colecciones necesarias para realizar pruebas (por ejemplo, colecciones de Postman o archivos JSON de ejemplo).
+Incluye:
+- Endpoints CRUD de usuarios, posts, comentarios, imágenes y etiquetas
+- Esquemas de datos
+- Parámetros requeridos
+- Ejemplos de request y response
 
-###
+---
 
-# Recomendaciones y ayudas
+## 📦 Base de datos
 
-Les entregamos este link que apunta a un front-end ya desarrollado para que puedan investigarlo y puedan crear el back-end que se ajuste lo maximo posiblel funcionamiento del front.
+- MongoDB con esquemas definidos en `/src/mongoSchemas`
+- Redis para almacenamiento en caché de respuestas frecuentes
+- Conexión configurada en `mongodb.js` y `rediscache.js`
 
-[https://unahur.vmdigitai.com/redes-front/users](https://unahur.vmdigitai.com/redes-front/users)
+---
 
-Por otro lado les dejamos la documentació de los endpoint para que también la puedan revisar y armar siguiendo este link
+## ✨ Bonus
 
-[https://unahur.vmdigitai.com/swagger/](https://unahur.vmdigitai.com/swagger/)
+- [x] Caché con Redis para endpoints GET
+- [ ] Sistema de seguidores entre usuarios
+- [ ] Optimización con índices o agregaciones
 
-# Bonus
+---
 
-- Hace el upload de las imganes que se asocian a un POST que lo guarden en una carpeta de imagenes dentro del servidor web.
-- ¿Cómo modelarías que un usuario pueda "seguir" a otros usuarios, y a su vez ser seguido por muchos? Followers
-- Con la información de los post no varia muy seguido que estrategias podrian utilizar la que la información no sea constantemente consultada desde la base de datos.
+## 🧪 Pruebas
+
+Se recomienda el uso de Postman o Thunder Client.  
+
+---
+
+## 🧑‍💻 Autores
+
+Proyecto académico desarrollado en el marco de la Universidad Nacional de Hurlingham (UnaHur). Equipo de desarrollo:
+* Diego Andrés Primera
+* Facundo Gabriel Gutiérrez
+* Franco Cantero
+* Luana Belén Calderón 
+---
