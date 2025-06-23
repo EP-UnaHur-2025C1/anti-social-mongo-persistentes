@@ -1,5 +1,6 @@
 const { mongoose, schema, comment, user, post } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
+const TTL =  process.env.TTL ?? 60
 
 const getComentarios = async (_, res) => {
   const redisKey = 'Comentarios:todos';
@@ -9,7 +10,7 @@ const getComentarios = async (_, res) => {
       .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    await rediscache.set(redisKey, JSON.stringify(comentarios), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(comentarios), { EX: TTL });
     res.status(200).json(comentarios);
 
   } catch (error) {
@@ -28,7 +29,7 @@ const getComentarioPorId = async (req, res) => {
       .select('mensaje FechaDePublicacion visibilidad')
       .populate({ path: 'usuario', select: 'nickName email -_id' })
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    await rediscache.set(redisKey, JSON.stringify(comentario), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(comentario), { EX: TTL });
     res.status(200).json(comentario);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -55,6 +56,9 @@ const crearComentario = async (req, res) => {
     if (!usuarioCreador) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
+    if (!posteoDelComentario) {
+      return res.status(404).json({ error: 'Posteo no encontrado' });
+    }
     const newComment = new comment({
       mensaje,
       FechaDePublicacion,
@@ -63,16 +67,19 @@ const crearComentario = async (req, res) => {
       posteo
 
     })
+    
+    
     usuarioCreador.comentarios.push(newComment._id)
     await usuarioCreador.save()
     posteoDelComentario.comentarios.push(newComment._id)
     await posteoDelComentario.save()
     await newComment.save();
+    
 
 
     await rediscache.del('Comentarios:todos');
     await rediscache.del('Posteos:todos');
-    await rediscache.del(`posteos:${posteoDelComentario}`);
+    await rediscache.del(`Posteos:${posteoDelComentario}`);
     await rediscache.del('Users:todos');
     await rediscache.del(`Users:${usuarioCreador}`);
     res.status(201).json(newComment);
@@ -103,8 +110,8 @@ const modificarComentario = async (req, res) => {
 };
 
 const eliminarComentarioPorId = async (req, res) => {
-  const usuarioCreador = await user.findByOne({comentarios:req.params.id})
-  const posteoDelComentario = await post.findByOne({comentarios:req.params.id})
+  const usuarioCreador = await user.findOne({comentarios:req.params.id})
+  const posteoDelComentario = await post.findOne({comentarios:req.params.id})
   try {
     const commentId = req.params.id;
 

@@ -1,6 +1,7 @@
 const { request } = require("express");
 const { mongoose, schema, post, user, tag, comment, post_Image } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
+const TTL =  process.env.TTL ?? 60
 
 const getPosts = async (_, res) => {
   const redisKey = 'Posteos:todos';
@@ -13,7 +14,7 @@ const getPosts = async (_, res) => {
       .populate({ path: 'comentarios', match: { visibilidad: true }, select: 'mensaje FechaDePublicacion -_id' })
       .populate({ path: 'imagenes', select: 'url -_id' })
       .populate({ path: 'etiquetas', select: 'name -_id' });
-    await rediscache.set(redisKey, JSON.stringify(Post), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(Post), { EX: TTL });
     res.status(200).json(Post);
 
   } catch (error) {
@@ -37,7 +38,7 @@ const getPostPorId = async (req, res) => {
     if (!posteo) {
       return res.status(404).json({ message: 'No se encontro el post' });
     }
-    await rediscache.set(redisKey, JSON.stringify(posteo), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(posteo), { EX: TTL });
     res.status(200).json(JSON.parse(JSON.stringify(posteo)));
   } catch (error) {
     res.status(500).json({ error: error.message });

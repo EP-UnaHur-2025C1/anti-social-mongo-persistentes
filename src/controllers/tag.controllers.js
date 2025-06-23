@@ -1,6 +1,7 @@
 const { request } = require("express");
 const { mongoose, schema, tag } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
+const TTL =  process.env.TTL ?? 60
 
 const getTags = async (_, res) => {
   const redisKey = 'Tags:todos';
@@ -14,7 +15,7 @@ const getTags = async (_, res) => {
         select: 'Descripcion FechaDeCreacion usuario -_id',
         populate: { path: 'usuario', select: 'nickName email -_id' }
       })
-    await rediscache.set(redisKey, JSON.stringify(Tag), { EX: 60 });
+    await rediscache.set(redisKey, JSON.stringify(Tag), { EX: TTL });
     res.status(200).json(Tag);
 
   } catch (error) {
@@ -39,7 +40,7 @@ const getTagPorId = async (req, res) => {
     if (!etiqueta) {
       return res.status(404).json({ message: 'No se encontro el tag' });
     }
-    await rediscache.set(redisKey, JSON.stringify(etiqueta), { EX: 60 });
+    await rediscache.set(redisKey, JSON.stringify(etiqueta), { EX: TTL });
     res.status(200).json(etiqueta);
   } catch (error) {
     res.status(500).json({ error: error.message });

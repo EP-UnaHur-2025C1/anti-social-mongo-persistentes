@@ -10,19 +10,24 @@ const userSchema = Joi.object({
 // COMMENT
 const commentSchema = Joi.object({
   mensaje: Joi.string().max(200).required(),
-  FechaDePublicacion: Joi.date().required()
+  FechaDePublicacion: Joi.date().required(),
+  usuario: Joi.string(),
+  posteo: Joi.string()
+  
 });
 
 // POST
 const postSchema = Joi.object({
   Descripcion: Joi.string().max(200).required(),
-  FechaDeCreacion: Joi.date().iso().required()
+  FechaDeCreacion: Joi.date().iso().required(),
+  userId: Joi.string()
  
 });
 
 // POST_IMAGES
 const postImagesSchema = Joi.object({
-  url: Joi.string().uri().required()
+  url: Joi.string().uri().required(),
+  posteo: Joi.string()
  
 });
 

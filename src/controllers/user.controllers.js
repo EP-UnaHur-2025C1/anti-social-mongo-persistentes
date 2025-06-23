@@ -1,6 +1,7 @@
 const { request } = require("express");
 const { mongoose, schema, user, post,comment } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
+const TTL =  process.env.TTL ?? 60
 
 const getUsers = async (_, res) => {
   const redisKey = 'Users:todos';
@@ -16,7 +17,7 @@ const getUsers = async (_, res) => {
         select: 'mensaje FechaDePublicacion -_id',
         populate:{path:'posteo',select:'Descripcion -_id'}
       });
-    await rediscache.set(redisKey, JSON.stringify(User), { EX: 30 });
+    await rediscache.set(redisKey, JSON.stringify(User), { EX: TTL });
     res.status(200).json(User);
 
   } catch (error) {
@@ -42,7 +43,7 @@ const getUserPorId = async (req, res) => {
     if (!usuario) {
       return res.status(404).json({ message: 'No se encontro el user' });
     }
-    await rediscache.set(redisKey, JSON.stringify(usuario), { EX: 30 });
+    await rediscache.set(redisKey, JSON.stringify(usuario), { EX: TTL });
     res.status(200).json(usuario);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -107,13 +108,13 @@ const eliminarUserPorId = async (req, res) => {
     await rediscache.del('Tags:todos');
     await rediscache.del('Comentarios:todos');
 
-    if (userActualizado.posteos.length) {
-         for (const post of userActualizado.posteos) {
+    if (userEliminado.posteos.length) {
+         for (const post of userEliminado.posteos) {
            await rediscache.del(`Posteos:${post}`);
          }
         }
-   if (userActualizado.comentarios.length) {
-         for (const comentario of userActualizado.comentarios) {
+   if (userEliminado.comentarios.length) {
+         for (const comentario of userEliminado.comentarios) {
            await rediscache.del(`Comentarios:${comentario}`);
          }
         }

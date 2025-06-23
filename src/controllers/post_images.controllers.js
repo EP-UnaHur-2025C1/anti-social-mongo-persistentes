@@ -2,6 +2,7 @@
 
 const { mongoose, schema, post_Image, post, user } = require("../db/mongoSchemas/index")
 const rediscache = require("../db/rediscache")
+const TTL =  process.env.TTL ?? 60
 
 const getPostImages = async (_, res) => {
   const redisKey = 'PostImages:todos';
@@ -11,7 +12,7 @@ const getPostImages = async (_, res) => {
     const postImages = await post_Image.find()
       .select('url')
       .populate({ path: 'posteo', select: 'Descripcion FechaDeCreacion -_id' })
-    await rediscache.set(redisKey, JSON.stringify(postImages), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(postImages), { EX: TTL });
     res.status(200).json(postImages);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -30,7 +31,7 @@ const getPostImagePorId = async (req, res) => {
     if (!postImage) {
       return res.status(404).json({ message: 'No se encontro el post' });
     }
-    await rediscache.set(redisKey, JSON.stringify(postImage), { EX: 300 });
+    await rediscache.set(redisKey, JSON.stringify(postImage), { EX: TTL });
     res.status(200).json(postImage);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al eliminar la imagen', error: error.message});
@@ -90,8 +91,8 @@ const modificarPostImage = async (req, res) => {
 };
 
 const eliminarPostImagePorId = async (req, res) => {
-  const posteoDeLaImagen = await post.findOne({posteo: post_Image.findById(req.params.id)})
-  const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen._id})
+  const posteoDeLaImagen = await post.findOne({posteo:await post_Image.findById(req.params.id)})
+  const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen})
   try {
     const postImagesId = req.params.id;
 
