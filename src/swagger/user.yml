@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+  description: API para gestionar usuarios y sus relaciones con comentarios y posteos
+  contact:
+    name: Tu Nombre
+
+paths:
+  /user:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+        - User
+      responses:
+        '200':
+          description: Lista de usuarios con sus posteos y comentarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserWithRelations'
+
+    post:
+      summary: Crear un nuevo usuario
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: Usuario creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Error de validación
+
+  /user/{id}:
+    get:
+      summary: Obtener usuario por ID
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithRelations'
+        '404':
+          description: Usuario no encontrado
+
+    delete:
+      summary: Eliminar usuario por ID
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario eliminado exitosamente
+        '404':
+          description: Usuario no encontrado
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único del usuario
+        nickName:
+          type: string
+          minLength: 6
+          maxLength: 20
+          description: Apodo del usuario
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+
+    NewUser:
+      type: object
+      required:
+        - nickName
+        - email
+      properties:
+        nickName:
+          type: string
+          minLength: 6
+          maxLength: 20
+          description: Apodo del usuario
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+
+    UserWithRelations:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            posteos:
+              type: array
+              description: Lista de posteos realizados por el usuario
+              items:
+                type: object
+                properties:
+                  Descripcion:
+                    type: string
+                    description: Descripción del post
+                  FechaDeCreacion:
+                    type: string
+                    format: date
+                    description: Fecha de creación del post
+            comentarios:
+              type: array
+              description: Lista de comentarios realizados por el usuario
+              items:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    description: Contenido del comentario
+                  FechaDePublicacion:
+                    type: string
+                    format: date
+                    description: Fecha de publicación del comentario

@@ -1,0 +1,127 @@
+openapi: 3.0.0
+info:
+  title: API de Imágenes de Posteos
+  version: 1.0.0
+  description: Documentación para la entidad Post_images
+  contact:
+    name: Tu Nombre
+
+servers:
+  - url: http://localhost:3001
+    description: Servidor local
+
+paths:
+  /post_images:
+    get:
+      summary: Obtener todas las imágenes de posteos
+      tags:
+        - Post_images
+      responses:
+        '200':
+          description: Lista de imágenes con información de sus posteos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostImageWithPost'
+    post:
+      summary: Crear una nueva imagen para un posteo
+      tags:
+        - Post_images
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPostImage'
+      responses:
+        '201':
+          description: Imagen creada correctamente
+        '400':
+          description: Error de validación
+
+  /post_images/{id}:
+    get:
+      summary: Obtener una imagen por su ID
+      tags:
+        - Post_images
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la imagen
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Imagen encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostImage'
+        '404':
+          description: Imagen no encontrada
+    delete:
+      summary: Eliminar una imagen por su ID
+      tags:
+        - Post_images
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la imagen
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Imagen eliminada exitosamente
+        '404':
+          description: Imagen no encontrada
+
+components:
+  schemas:
+    PostImage:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único de la imagen
+        url:
+          type: string
+          format: uri
+          description: URL de la imagen
+        postId:
+          type: integer
+          description: ID del post al que pertenece la imagen
+
+    NewPostImage:
+      type: object
+      required:
+        - url
+        - postId
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL de la imagen
+        postId:
+          type: integer
+          description: ID del post al que se asociará la imagen
+
+    PostImageWithPost:
+      allOf:
+        - $ref: '#/components/schemas/PostImage'
+        - type: object
+          properties:
+            posteo:
+              type: object
+              description: Información del post asociado
+              properties:
+                Descripcion:
+                  type: string
+                  description: Descripción del post
+                FechaDeCreacion:
+                  type: string
+                  format: date
+                  description: Fecha de creación del post

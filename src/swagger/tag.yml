@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Tag API
+  version: 1.0.0
+  description: API para gestionar etiquetas (tags)
+
+paths:
+  /tag:
+    get:
+      summary: Obtener todas las etiquetas
+      tags:
+        - Tag
+      responses:
+        '200':
+          description: Lista de etiquetas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+    post:
+      summary: Crear una nueva etiqueta
+      tags:
+        - Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTag'
+      responses:
+        '201':
+          description: Etiqueta creada exitosamente
+
+  /tag/{id}:
+    get:
+      summary: Obtener una etiqueta por ID
+      tags:
+        - Tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Una etiqueta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+    delete:
+      summary: Eliminar una etiqueta por ID
+      tags:
+        - Tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Etiqueta eliminada exitosamente
+components:
+  schemas:
+    Tag:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          description: ID único de la etiqueta
+        name:
+          type: string
+          maxLength: 20
+          pattern: '^\S+$'
+          description: Nombre de la etiqueta (sin espacios)
+        posteos:
+          type: array
+          description: Lista de posteos asociados
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: ID del posteo
+
+    NewTag:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 20
+          pattern: '^\S+$'
+          description: Nombre de la etiqueta (sin espacios)

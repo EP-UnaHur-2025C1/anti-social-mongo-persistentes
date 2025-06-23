@@ -71,8 +71,8 @@ const crearPostImage = async (req, res) => {
 };
 
 const modificarPostImage = async (req, res) => {
-  const posteoDeLaImagen = await post.findOne({posteo: post_Image.findById(req.params.id)})
-  const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen._id})
+  const posteoDeLaImagen = await post.findOne({posteo: await post_Image.findById(req.params.id)})
+  const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen})
   try {
     const postImageActualizada = await post_Image.findByIdAndUpdate(req.params.id, req.body, { new: true })
     if (!postImageActualizada) {
@@ -91,7 +91,7 @@ const modificarPostImage = async (req, res) => {
 };
 
 const eliminarPostImagePorId = async (req, res) => {
-  const posteoDeLaImagen = await post.findOne({posteo:await post_Image.findById(req.params.id)})
+  const posteoDeLaImagen = await post.findOne({posteo: await post_Image.findById(req.params.id)})
   const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen})
   try {
     const postImagesId = req.params.id;
