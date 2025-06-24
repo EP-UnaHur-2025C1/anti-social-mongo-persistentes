@@ -1,28 +1,18 @@
-openapi: 3.0.0
-info:
-  title: Comment API
-  version: 1.0.0
-  description: API para gestionar comentarios
-
 paths:
   /comment:
     get:
       summary: Obtener todos los comentarios
       tags:
-        - Comment
+        - Comentarios
       responses:
         '200':
-          description: Lista de comentarios
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
+          description: Lista de comentarios obtenida exitosamente
+        '500':
+          description: Error en el servidor
     post:
       summary: Crear un nuevo comentario
       tags:
-        - Comment
+        - Comentarios
       requestBody:
         required: true
         content:
@@ -32,76 +22,73 @@ paths:
       responses:
         '201':
           description: Comentario creado exitosamente
+        '400':
+          description: Error en la solicitud
 
   /comment/{id}:
     get:
       summary: Obtener un comentario por ID
       tags:
-        - Comment
+        - Comentarios
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del comentario
       responses:
         '200':
-          description: Un comentario
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-
+          description: Comentario encontrado
+        '404':
+          description: Comentario no encontrado
+        '500':
+          description: Error en el servidor
+    put:
+      summary: Modificar un comentario por ID
+      tags:
+        - Comentarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+      responses:
+        '200':
+          description: Comentario actualizado
+        '400':
+          description: Error en la solicitud
+        '404':
+          description: Comentario no encontrado
     delete:
       summary: Eliminar un comentario por ID
       tags:
-        - Comment
+        - Comentarios
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del comentario
       responses:
         '200':
-          description: Comentario eliminado exitosamente
+          description: Comentario eliminado
+        '404':
+          description: Comentario no encontrado
+        '500':
+          description: Error en el servidor
 
 components:
   schemas:
-    Comment:
-      type: object
-      properties:
-        mensaje:
-          type: string
-          maxLength: 200
-          description: Contenido del comentario
-        FechaDePublicacion:
-          type: string
-          format: date
-          description: Fecha en la que se publicó el comentario
-        posteo:
-          type: object
-          description: Información básica del post asociado
-          properties:
-            Descripcion:
-              type: string
-              description: Descripción del post
-            FechaDeCreacion:
-              type: string
-              format: date
-              description: Fecha de creación del post
-        usuario:
-          type: object
-          description: Información del usuario que hizo el comentario
-          properties:
-            nickName:
-              type: string
-              description: Apodo del usuario
-            email:
-              type: string
-              format: email
-              description: Correo electrónico del usuario
-
     NewComment:
       type: object
       required:
@@ -114,13 +101,17 @@ components:
           type: string
           maxLength: 200
           description: Contenido del comentario
+          example: Este es un comentario de ejemplo
         FechaDePublicacion:
           type: string
           format: date
-          description: Fecha en la que se publicó el comentario (hasta 6 meses atrás)
+          description: Fecha en que se publicó el comentario
+          example: 2024-06-23
         userId:
-          type: integer
+          type: string
           description: ID del usuario que comenta
+          example: 60d0fe4f5311236168a109ca
         postId:
-          type: integer
+          type: string
           description: ID del post comentado
+          example: 60d0fe4f5311236168a109cb

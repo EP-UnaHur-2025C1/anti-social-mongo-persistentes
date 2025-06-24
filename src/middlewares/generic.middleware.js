@@ -10,7 +10,7 @@ const existsSchemaById = (schema) => {
         try {
             const data = await schema.findById(id);
             if (!data) {
-                return res.status(404).json({ message: El `id ${id} no se encuentra registrado` });
+                return res.status(404).json({ message: `El id ${id} no se encuentra registrado` });
             }
             next();
         } catch (error) {

@@ -1,29 +1,18 @@
-openapi: 3.0.0
-info:
-  title: Tag API
-  version: 1.0.0
-  description: API para gestionar etiquetas (tags)
-
 paths:
   /tag:
     get:
-      summary: Obtener todas las etiquetas
+      summary: Obtener todos los tags
       tags:
-        - Tag
+        - Tags
       responses:
         '200':
-          description: Lista de etiquetas
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Tag'
-
+          description: Lista de tags obtenida exitosamente
+        '500':
+          description: Error en el servidor
     post:
-      summary: Crear una nueva etiqueta
+      summary: Crear un nuevo tag
       tags:
-        - Tag
+        - Tags
       requestBody:
         required: true
         content:
@@ -32,66 +21,74 @@ paths:
               $ref: '#/components/schemas/NewTag'
       responses:
         '201':
-          description: Etiqueta creada exitosamente
+          description: Tag creado exitosamente
+        '400':
+          description: Error en la solicitud
 
   /tag/{id}:
     get:
-      summary: Obtener una etiqueta por ID
+      summary: Obtener un tag por ID
       tags:
-        - Tag
+        - Tags
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del tag
       responses:
         '200':
-          description: Una etiqueta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tag'
-
+          description: Tag encontrado
+        '404':
+          description: Tag no encontrado
+        '500':
+          description: Error en el servidor
+    put:
+      summary: Modificar un tag por ID
+      tags:
+        - Tags
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTag'
+      responses:
+        '200':
+          description: Tag actualizado
+        '400':
+          description: Error en la solicitud
+        '404':
+          description: Tag no encontrado
     delete:
-      summary: Eliminar una etiqueta por ID
+      summary: Eliminar un tag por ID
       tags:
-        - Tag
+        - Tags
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del tag
       responses:
         '200':
-          description: Etiqueta eliminada exitosamente
+          description: Tag eliminado
+        '404':
+          description: Tag no encontrado
+        '500':
+          description: Error en el servidor
+
 components:
   schemas:
-    Tag:
-      type: object
-      required:
-        - name
-      properties:
-        id:
-          type: integer
-          minimum: 0
-          description: ID único de la etiqueta
-        name:
-          type: string
-          maxLength: 20
-          pattern: '^\S+$'
-          description: Nombre de la etiqueta (sin espacios)
-        posteos:
-          type: array
-          description: Lista de posteos asociados
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: ID del posteo
-
     NewTag:
       type: object
       required:
@@ -99,6 +96,5 @@ components:
       properties:
         name:
           type: string
-          maxLength: 20
-          pattern: '^\S+$'
-          description: Nombre de la etiqueta (sin espacios)
+          description: Nombre del tag
+          example: programación

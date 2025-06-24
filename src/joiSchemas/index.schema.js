@@ -20,14 +20,14 @@ const commentSchema = Joi.object({
 const postSchema = Joi.object({
   Descripcion: Joi.string().max(200).required(),
   FechaDeCreacion: Joi.date().iso().required(),
-  userId: Joi.string()
+  usuario: Joi.string()
  
 });
 
 // POST_IMAGES
 const postImagesSchema = Joi.object({
   url: Joi.string().uri().required(),
-  posteo: Joi.string()
+  posteo: Joi.string().required()
  
 });
 

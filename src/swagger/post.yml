@@ -1,29 +1,16 @@
-openapi: 3.0.0
-info:
-  title: Red Anti-Social API
-  version: 1.0.0
-  description: API que permite a los usuarios realizar publicaciones, añadir etiquetas, imágenes y recibir comentarios
-  contact:
-    name: Tu Nombre
-
 paths:
   /post:
     get:
-      summary: Obtener todos los posteos
+      summary: Obtener todos los posts
       tags:
         - Post
       responses:
         '200':
-          description: Lista de posteos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
-
+          description: Lista de posts obtenida exitosamente
+        '500':
+          description: Error en el servidor
     post:
-      summary: Crear un nuevo posteo
+      summary: Crear un nuevo post
       tags:
         - Post
       requestBody:
@@ -36,149 +23,113 @@ paths:
         '201':
           description: Post creado exitosamente
         '400':
-          description: Error de validación
+          description: Error en la solicitud
 
   /post/{id}:
     get:
-      summary: Obtener un posteo por ID
+      summary: Obtener un post por ID
       tags:
         - Post
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del post
       responses:
         '200':
           description: Post encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
         '404':
           description: Post no encontrado
-
-    delete:
-      summary: Eliminar un posteo por ID
+    put:
+      summary: Modificar un post por ID
       tags:
         - Post
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
-      responses:
-        '200':
-          description: Post eliminado exitosamente
-        '404':
-          description: Post no encontrado
-
-    post:
-      summary: Agregar una etiqueta a un posteo
-      tags:
-        - Post
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ID del posteo
-          schema:
-            type: integer
+            type: string
+          description: ID del post
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddTagToPost'
+              $ref: '#/components/schemas/NewPost'
       responses:
-        '201':
-          description: Etiqueta agregada al posteo
+        '200':
+          description: Post actualizado
         '400':
-          description: Datos inválidos
+          description: Error en la solicitud
+        '404':
+          description: Post no encontrado
+    delete:
+      summary: Eliminar un post por ID
+      tags:
+        - Post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del post
+      responses:
+        '200':
+          description: Post eliminado
+        '404':
+          description: Post no encontrado
+
+  /post/addTag/{id}:
+    put:
+      summary: Agregar un tag a un post por ID
+      tags:
+        - Post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - etiquetas
+              properties:
+                etiquetas:
+                  type: string
+                  description: ID del tag a agregar
+      responses:
+        '200':
+          description: Tag agregado al post
+        '400':
+          description: Error en la solicitud
+        '404':
+          description: Post o tag no encontrado
 
 components:
   schemas:
-    Post:
-      type: object
-      properties:
-        Descripcion:
-          type: string
-          maxLength: 280
-          description: Texto del post
-        FechaDeCreacion:
-          type: string
-          format: date
-          description: Fecha en la que se creó el post
-        usuario:
-          type: object
-          description: Usuario que creó el post
-          properties:
-            nickName:
-              type: string
-              description: Apodo del usuario
-            email:
-              type: string
-              format: email
-              description: Correo electrónico del usuario
-        etiquetas:
-          type: array
-          description: Lista de etiquetas asociadas
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: Nombre de la etiqueta
-        comentarios:
-          type: array
-          description: Comentarios realizados sobre el post
-          items:
-            type: object
-            properties:
-              mensaje:
-                type: string
-                description: Contenido del comentario
-              FechaDePublicacion:
-                type: string
-                format: date
-                description: Fecha de publicación del comentario
-        imagenes:
-          type: array
-          description: Imágenes asociadas al post
-          items:
-            type: object
-            properties:
-              url:
-                type: string
-                format: uri
-                description: URL de la imagen
-
     NewPost:
       type: object
       required:
-        - Descripcion
-        - FechaDeCreacion
-        - userId
+        - titulo
+        - contenido
       properties:
         Descripcion:
           type: string
-          maxLength: 280
-          description: Texto del post
+          description: Título del post
         FechaDeCreacion:
           type: string
           format: date
-          description: Fecha en la que se creó el post
-        userId:
-          type: integer
-          description: ID del usuario que publica
-
-    AddTagToPost:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          type: integer
-          description: ID de la etiqueta a asociar al post
+          description: Fecha de creación del post
+        usuario:
+          type: string
+          description: ID del usuario que publica el post

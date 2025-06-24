@@ -89,8 +89,8 @@ const crearComentario = async (req, res) => {
 };
 
 const modificarComentario = async (req, res) => {
-  const usuarioCreador = await user.findByOne({comentarios:req.params.id})
-  const posteoDelComentario = await post.findByOne({comentarios:req.params.id})
+  const usuarioCreador = await user.findOne({comentarios:req.params.id})
+  const posteoDelComentario = await post.findOne({comentarios:req.params.id})
   try {
     const comentarioActualizado = await comment.findByIdAndUpdate(req.params.id, req.body, { new: true })
     if (!comentarioActualizado) {

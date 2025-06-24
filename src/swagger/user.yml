@@ -1,146 +1,99 @@
-openapi: 3.0.0
-info:
-  title: User API
-  version: 1.0.0
-  description: API para gestionar usuarios y sus relaciones con comentarios y posteos
-  contact:
-    name: Tu Nombre
-
 paths:
-  /user:
+  /User:
     get:
       summary: Obtener todos los usuarios
       tags:
-        - User
+        - Usuarios
       responses:
         '200':
-          description: Lista de usuarios con sus posteos y comentarios
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserWithRelations'
-
+          description: Lista de usuarios obtenida exitosamente
+        '500':
+          description: Error en el servidor
     post:
       summary: Crear un nuevo usuario
       tags:
-        - User
+        - Usuarios
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewUser'
+              $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: Usuario creado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+          description: Usuario creado exitosamente
         '400':
-          description: Error de validación
-
-  /user/{id}:
+          description: Error en la solicitud
+  /User/{id}:
     get:
-      summary: Obtener usuario por ID
+      summary: Obtener un usuario por ID
       tags:
-        - User
+        - Usuarios
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del usuario
       responses:
         '200':
           description: Usuario encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserWithRelations'
         '404':
           description: Usuario no encontrado
-
-    delete:
-      summary: Eliminar usuario por ID
+        '500':
+          description: Error en el servidor
+    put:
+      summary: Modificar un usuario por ID
       tags:
-        - User
+        - Usuarios
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
-            type: integer
+            type: string
+          description: ID del usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: Usuario eliminado exitosamente
+          description: Usuario actualizado
+        '400':
+          description: Error en la solicitud
         '404':
           description: Usuario no encontrado
+    delete:
+      summary: Eliminar un usuario por ID
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del usuario
+      responses:
+        '200':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
 
 components:
   schemas:
     User:
       type: object
       properties:
-        id:
-          type: integer
-          description: ID único del usuario
         nickName:
           type: string
-          minLength: 6
-          maxLength: 20
-          description: Apodo del usuario
+          example: usuario123
         email:
           type: string
-          format: email
-          description: Correo electrónico del usuario
-
-    NewUser:
-      type: object
-      required:
-        - nickName
-        - email
-      properties:
-        nickName:
-          type: string
-          minLength: 6
-          maxLength: 20
-          description: Apodo del usuario
-        email:
-          type: string
-          format: email
-          description: Correo electrónico del usuario
-
-    UserWithRelations:
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          properties:
-            posteos:
-              type: array
-              description: Lista de posteos realizados por el usuario
-              items:
-                type: object
-                properties:
-                  Descripcion:
-                    type: string
-                    description: Descripción del post
-                  FechaDeCreacion:
-                    type: string
-                    format: date
-                    description: Fecha de creación del post
-            comentarios:
-              type: array
-              description: Lista de comentarios realizados por el usuario
-              items:
-                type: object
-                properties:
-                  mensaje:
-                    type: string
-                    description: Contenido del comentario
-                  FechaDePublicacion:
-                    type: string
-                    format: date
-                    description: Fecha de publicación del comentario
+          example: usuario@correo.com

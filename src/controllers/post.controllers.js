@@ -50,8 +50,8 @@ const getPostPorId = async (req, res) => {
 
 const crearPost = async (req, res) => {
   try {
-    const { Descripcion, FechaDeCreacion, userId } = req.body
-    const usuarioCreador = await user.findById(userId)
+    const { Descripcion, FechaDeCreacion, usuario } = req.body
+    const usuarioCreador = await user.findById(usuario)
 
     if (!usuarioCreador) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -92,7 +92,7 @@ const modificarPost = async (req, res) => {
    await rediscache.del(`Users:${usuarioCreador}`);
    await rediscache.del('Tags:todos');
    if (postOriginal.etiquetas.length) {
-     for (const tag of postOriginal.tags) {
+     for (const tag of postOriginal.etiquetas) {
        await rediscache.del(`Tag:${tag}`);
      }
     res.status(200).json({ mensaje: 'post actualizado ', post: postActualizado });
@@ -106,15 +106,19 @@ const agregarTagAlPost = async (req, res) => {
   const usuarioCreador = await user.findOne({ posteos: req.params.id })
   try {
     const postId = await req.params.id
+   
     const tagAgregado = await tag.findById(req.body.etiquetas)
     const postActualizado = await post.findByIdAndUpdate(postId, req.body, { new: true })
     if (!postActualizado) {
       return res.status(404).json({ message: 'post no encontrado' });
     }
+    
+     if (!tagAgregado) {
+      return res.status(404).json({ message: 'Tag no encontrado' });
+    }
 
 
-
-    tagAgregado.posteos.push(postActualizado._id);
+    tagAgregado.posteos.push(postActualizado);
     await tagAgregado.save()
 
     await rediscache.del('Posteos:todos');

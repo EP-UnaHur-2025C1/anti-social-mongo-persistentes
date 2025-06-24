@@ -6,7 +6,7 @@ const PORT = process.env.PORT ?? 3000
 const rediscache = require("../src/db/rediscache")
 const dotenv = require('dotenv')
 const swaggerUi = require("swagger-ui-express");
-const specs = require("../swagger/swagger");
+const specs = require("./swagger/swagger");
 
 
 dotenv.config();

@@ -91,10 +91,10 @@ const modificarPostImage = async (req, res) => {
 };
 
 const eliminarPostImagePorId = async (req, res) => {
-  const posteoDeLaImagen = await post.findOne({posteo: await post_Image.findById(req.params.id)})
+  const postImagesId = req.params.id;
+  const posteoDeLaImagen = await post.findOne({posteo: await post_Image.findById(postImagesId)})
   const usuarioDelPosteo = await user.findOne({posteos: posteoDeLaImagen})
   try {
-    const postImagesId = req.params.id;
 
     const postImageEliminada = await post_Image.findByIdAndDelete(postImagesId);
     if (!postImageEliminada) {
