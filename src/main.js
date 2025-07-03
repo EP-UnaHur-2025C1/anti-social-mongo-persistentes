@@ -7,14 +7,17 @@ const rediscache = require("../src/db/rediscache")
 const dotenv = require('dotenv')
 const swaggerUi = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
+const cors = require('cors')
 
 
 dotenv.config();
+app.use(cors({ origin: 'http://localhost:5173' }))
 
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customSiteTitle: 'UnaHur Anti-Social Net',
 }));
+
 
 app.use(express.json());
 app.use("/comment",commentRoute);
